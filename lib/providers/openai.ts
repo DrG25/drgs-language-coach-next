@@ -6,11 +6,16 @@ export async function openAiTranscribe(
   audioBuffer: Buffer,
   language?: string
 ): Promise<string> {
+  // Buffer is not compatible with OpenAI's Uploadable type.
+  // Convert to Blob.
+  const file = new Blob([audioBuffer], { type: "audio/webm" });
+
   const res = await openai.audio.transcriptions.create({
-    file: audioBuffer,
+    file,
     model: process.env.OPENAI_WHISPER_MODEL || "whisper-1",
     language,
   });
+
   return (res as any).text ?? "";
 }
 
