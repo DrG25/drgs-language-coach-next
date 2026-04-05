@@ -6,8 +6,8 @@ export async function openAiTranscribe(
   audioBuffer: Buffer,
   language?: string
 ): Promise<string> {
-  // OpenAI SDK types require an Uploadable (File/Blob), but the API supports { data, name } too.
-  const file = { data: audioBuffer, name: "input.webm" } as any;
+  // Upload audio as a byte array (Uploadable) to OpenAI.
+  const file = new Uint8Array(audioBuffer);
 
   const res = await openai.audio.transcriptions.create({
     file,
