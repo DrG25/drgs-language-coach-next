@@ -7,8 +7,8 @@ export async function openAiTranscribe(
   language?: string
 ): Promise<string> {
   // Buffer is not compatible with OpenAI's Uploadable type.
-  // Convert to Blob.
-  const file = new Blob([audioBuffer], { type: "audio/webm" });
+  // Convert to a compatible BlobPart.
+  const file = new Blob([new Uint8Array(audioBuffer)], { type: "audio/webm" });
 
   const res = await openai.audio.transcriptions.create({
     file,
