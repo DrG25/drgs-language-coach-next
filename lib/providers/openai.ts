@@ -6,12 +6,11 @@ export async function openAiTranscribe(
   audioBuffer: Buffer,
   language?: string
 ): Promise<string> {
-  // Buffer is not compatible with OpenAI's Uploadable type.
-  // Convert to a Blob and pass as any.
-  const file = new Blob([new Uint8Array(audioBuffer)], { type: "audio/webm" });
+  // OpenAI SDK types require an Uploadable (File/Blob), but the API supports { data, name } too.
+  const file = { data: audioBuffer, name: "input.webm" } as any;
 
   const res = await openai.audio.transcriptions.create({
-    file: file as any,
+    file,
     model: process.env.OPENAI_WHISPER_MODEL || "whisper-1",
     language,
   });
@@ -28,14 +27,16 @@ type DrGParams = {
 export async function openAiCoachText(params: DrGParams) {
   const { transcript, targetLanguage, studentLevel } = params;
 
-  const systemPrompt = `Eres "Dr. G's Language Coach", un coach de idiomas claro, paciente y directo.
-Tu objetivo: ayudar al estudiante a practicar hablar en ${targetLanguage}.
+  const systemPrompt = `
+Eres "Dr. G's Language Coach", un coach de idiomas claro, paciente y directo.
+Tu objetivo: ayudar al estudiante a practicar HABLAR en ${targetLanguage}.
 Reglas:
 - Saluda breve y empieza.
-- Corrige errores sin humillar: da la frase correcta, explica 1 cosa máximo, y luego pide repetición.
+- Corrige errores sin humillar: da la frase correcta, explica 1 cosa máx, y luego pide repetición.
 - Mantén respuestas cortas (1-3 frases), especialmente para nivel ${studentLevel}.
-- Si el transcript está vacío o incoherente, pide que repita.
-- No cambies de idioma salvo para una explicación mínima.`;
+- Si el transcript está vacío o incoherente, pide que repita/describa nuevamente.
+- No cambies de idioma salvo para una explicación mínima.
+`;
 
   const completion = await openai.chat.completions.create({
     model: process.env.OPENAI_GPT_MODEL || "gpt-4",
@@ -46,7 +47,10 @@ Reglas:
     temperature: 0.3,
   });
 
-  return completion.choices[0]?.message?.content?.trim() || "Repitamos de nuevo, por favor.";
+  return (
+    completion.choices[0]?.message?.content?.trim() ||
+    "Repitamos de nuevo, por favor."
+  );
 }
 
 export async function openAiTextToSpeech(text: string, language: string) {
