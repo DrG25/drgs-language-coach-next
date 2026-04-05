@@ -11,7 +11,7 @@ type CoachResponse = {
 export default function Home() {
   const [status, setStatus] = useState<
     "idle" | "recording" | "loading" | "error"
-  >("idle");
+  >( "idle");
   const [last, setLast] = useState<CoachResponse | null>(null);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -72,27 +72,33 @@ export default function Home() {
 
   return (
     <main
-      style={{ maxWidth: 700, margin: "0 auto", padding: 24, fontFamily: "system-ui, sans-serif" }}
+      style={{
+        maxWidth: 700,
+        margin: "0 auto",
+        padding: 24,
+        fontFamily: "system-ui, sans-serif",
+      }}
     >
-      <h1>Dr. G&apos;s Language Coach</h1>
+      <h1>Dr. G's Language Coach</h1>
       <p>
-        <strong>Estado:</strong> {status}
+        <strong>Status:</strong> {status}
+      </p>
+      <p style={{ marginTop: 8 }}>
+        Tip: Speak in Spanish. The UI is English, but the practice is Spanish.
       </p>
 
-      {status === "idle" && <button onClick={startRecording}>🎙️ Hablar</button>}
-      {status === "recording" && (
-        <button onClick={stopRecording}>⏹️ Detener</button>
-      )}
+      {status === "idle" && <button onClick={startRecording}>🎙️ Talk</button>}
+      {status === "recording" && <button onClick={stopRecording}>⏹️ Stop</button>}
 
       {status === "error" && (
         <p style={{ color: "red" }}>
-          Hubo un error (micrófono/permisos o backend). Reintenta.
+          There was an error (microphone permissions or backend). Please try again.
         </p>
       )}
 
       {last && (
         <section style={{ marginTop: 24 }}>
-          <h3>Transcripción</h3>
+          <h3>Transcript</h3>
           <p>{last.transcript}</p>
           <h3>Dr. G</h3>
           <p>{last.coachText}</p>
