@@ -9,9 +9,9 @@ type CoachResponse = {
 };
 
 export default function Home() {
-  const [status, setStatus] = useState<
-    "idle" | "recording" | "loading" | "error"
-  >( "idle");
+  const [status, setStatus] = useState<"idle" | "recording" | "loading" | "error">(
+    "idle"
+  );
   const [last, setLast] = useState<CoachResponse | null>(null);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -33,6 +33,7 @@ export default function Home() {
 
       rec.onstop = async () => {
         setStatus("loading");
+
         const blob = new Blob(chunksRef.current, { type: "audio/webm" });
         const form = new FormData();
         form.append("audio", blob, "input.webm");
@@ -77,9 +78,11 @@ export default function Home() {
         margin: "0 auto",
         padding: 24,
         fontFamily: "system-ui, sans-serif",
+        lineHeight: 1.55,
       }}
     >
-      <h1>Dr. G's Language Coach</h1>
+      <h1>Dr. G&apos;s Language Coach</h1>
+
       <p>
         <strong>Status:</strong> {status}
       </p>
@@ -87,13 +90,52 @@ export default function Home() {
         Tip: Speak in Spanish. The UI is English, but the practice is Spanish.
       </p>
 
-      {status === "idle" && <button onClick={startRecording}>🎙️ Talk</button>}
-      {status === "recording" && <button onClick={stopRecording}>⏹️ Stop</button>}
+      <section style={{ marginTop: 24 }}>
+        <h2>How it works</h2>
+        <ol style={{ paddingLeft: 20 }}>
+          <li>Tap <strong>Talk</strong> and speak into your microphone.</li>
+          <li>Stop when you are done.</li>
+          <li>Dr. G transcribes you, coaches you, and plays back the correction.</li>
+        </ol>
+      </section>
+
+      <section style={{ marginTop: 20 }}>
+        <h2>What you need</h2>
+        <ul style={{ paddingLeft: 20 }}>
+          <li>Microphone access in your browser</li>
+          <li>A quiet space (background noise affects results)</li>
+          <li>Internet connection</li>
+        </ul>
+      </section>
+
+      <section style={{ marginTop: 20 }}>
+        <h2>Supported languages</h2>
+        <p>
+          Practice language: <strong>Spanish</strong> (more languages can be added later).
+        </p>
+      </section>
+
+      {status === "idle" && (
+        <button onClick={startRecording} style={{ marginTop: 16 }}>
+          🎙️ Talk
+        </button>
+      )}
+      {status === "recording" && (
+        <button onClick={stopRecording} style={{ marginTop: 16 }}>
+          ⏹️ Stop
+        </button>
+      )}
 
       {status === "error" && (
-        <p style={{ color: "red" }}>
-          There was an error (microphone permissions or backend). Please try again.
-        </p>
+        <section style={{ marginTop: 20 }}>
+          <p style={{ color: "red", marginBottom: 8 }}>
+            There was an error (microphone permissions or backend). Please try again.
+          </p>
+          <p>
+            If your microphone is disconnected or blocked, enable it in your browser permissions or System
+            Settings &gt; Privacy &amp; Security &gt; Microphone.
+          </p>
+        </section>
       )}
 
       {last && (
