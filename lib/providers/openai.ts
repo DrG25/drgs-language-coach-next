@@ -7,7 +7,7 @@ export async function openAiTranscribe(
   language?: string
 ): Promise<string> {
   const res = await openai.audio.transcriptions.create({
-    file: { data: audioBuffer, name: "input.webm" },
+    file: audioBuffer,
     model: process.env.OPENAI_WHISPER_MODEL || "whisper-1",
     language,
   });
